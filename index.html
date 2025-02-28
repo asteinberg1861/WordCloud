@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Crowdsourced Word Cloud</title>
+  <!-- Include wordcloud2.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.0.6/wordcloud2.min.js"></script>
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #myCanvas { border: 1px solid #ccc; margin-top: 20px; }
+    textarea { width: 100%; max-width: 800px; }
+  </style>
+</head>
+<body>
+  <h1>Crowdsourced Word Cloud</h1>
+  <p>Enter your text and click "Submit". Every submission will add to a shared word cloud!</p>
+  <textarea id="inputText" rows="5" placeholder="Type or paste your text here"></textarea><br>
+  <button onclick="submitText()">Submit</button>
+  <h2>Live Word Cloud</h2>
+  <canvas id="myCanvas" width="800" height="400"></canvas>
+  
+  <script>
+    // Your Firebase configuration (replace with your own project's config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHTHhUsy1B3m24qtCoKT8yUFKXFzEsXUQ",
+      authDomain: "word-cloud-8349d.firebaseapp.com",
+      databaseURL: "https://word-cloud-8349d-default-rtdb.firebaseio.com",
+      projectId: "word-cloud-8349d",
+      storageBucket: "word-cloud-8349d.firebasestorage.app",
+      messagingSenderId: "934500301074",
+      appId: "1:934500301074:web:bcdf5786f50300122a5bcb",
+      measurementId: "G-W74GX3KGT7"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // Submit text to Firebase
+    function submitText(){
+      var text = document.getElementById('inputText').value;
+      if(text.trim() !== ""){
+        // Push the text to the 'submissions' node with a timestamp
+        db.ref('submissions').push({
+          text: text,
+          timestamp: Date.now()
+        });
+        document.getElementById('inputText').value = ""; // clear the input field
+      }
+    }
+    
+    // Listen for changes in Firebase and update the word cloud
+    db.ref('submissions').on('value', (snapshot) => {
+      let aggregatedText = "";
+      snapshot.forEach(childSnapshot => {
+        aggregatedText += " " + childSnapshot.val().text;
+      });
+      generateWordCloud(aggregatedText);
+    });
+    
+    // Generate the word cloud based on the aggregated text from all users
+    function generateWordCloud(text){
+      // Break text into words and count frequency
+      var words = text.split(/\s+/);
+      var frequency = {};
+      words.forEach(function(word) {
+        word = word.toLowerCase().replace(/[^\w]/g, '');
+        if(word.length > 0) {
+          frequency[word] = (frequency[word] || 0) + 1;
+        }
+      });
+      
+      // Convert frequency object to list for the word cloud
+      var list = [];
+      for(var word in frequency) {
+        list.push([word, frequency[word]]);
+      }
+      
+      // Clear the canvas
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Generate word cloud with an increased weightFactor for larger text
+      WordCloud(canvas, { list: list, weightFactor: 20 });
+    }
+  </script>
+</body>
+</html>
