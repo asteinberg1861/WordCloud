@@ -20,6 +20,7 @@
   <p>Enter your text and click "Submit". Every submission will add to a shared word cloud!</p>
   <textarea id="inputText" rows="5" placeholder="Type or paste your text here"></textarea><br>
   <button onclick="submitText()">Submit</button>
+  <button onclick="clearWordCloud()">Clear Word Cloud</button>
   <h2>Live Word Cloud</h2>
   <canvas id="myCanvas" width="800" height="400"></canvas>
   
@@ -80,13 +81,18 @@
         list.push([word, frequency[word]]);
       }
       
-      // Clear the canvas
+      // Clear the canvas before drawing a new word cloud
+      clearWordCloud();
+      
+      // Generate word cloud with an increased weightFactor for larger text
+      WordCloud(document.getElementById('myCanvas'), { list: list, weightFactor: 20 });
+    }
+    
+    // Function to clear the canvas
+    function clearWordCloud() {
       var canvas = document.getElementById('myCanvas');
       var context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Generate word cloud with an increased weightFactor for larger text
-      WordCloud(canvas, { list: list, weightFactor: 20 });
     }
   </script>
 </body>
