@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Crowdsourced Word Cloud</title>
+  <!-- Google Font Overpass -->
+  <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;700&display=swap" rel="stylesheet">
   <!-- Include wordcloud2.js from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.0.6/wordcloud2.min.js"></script>
   <!-- Firebase App (the core Firebase SDK) -->
@@ -10,20 +12,56 @@
   <!-- Firebase Realtime Database -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #myCanvas { border: 1px solid #ccc; margin-top: 20px; }
-    textarea { width: 100%; max-width: 800px; }
+    body {
+      background-color: #d7d2cb;
+      color: #002855;
+      font-family: 'Overpass', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .blue-bar {
+      background-color: #002855;
+      width: 100%;
+      height: 20px;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+    }
+    #myCanvas {
+      border: 1px solid #ccc;
+      margin-top: 20px;
+      background-color: #ffffff;
+    }
+    textarea {
+      width: 100%;
+      max-width: 800px;
+    }
+    img.header-img {
+      width: 150px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Crowdsourced Word Cloud</h1>
-  <p>Enter your text and click "Submit". Every submission will add to a shared word cloud!</p>
-  <textarea id="inputText" rows="5" placeholder="Type or paste your text here"></textarea><br>
-  <button onclick="submitText()">Submit</button>
-  <!-- New button to clear stored submissions and reset the word cloud -->
-  <button onclick="resetWordCloud()">New Word Cloud</button>
-  <h2>Live Word Cloud</h2>
-  <canvas id="myCanvas" width="800" height="400"></canvas>
+  <div class="blue-bar"></div>
+  <div class="container">
+    <img class="header-img" src="https://cdn.prod.website-files.com/6717c08ce16fdfb6e857c965/6759abc00469e174b23a00b0_seal.svg" alt="Seal">
+    <h1>Crowdsourced Word Cloud</h1>
+    <p>Enter your text and click "Submit". Every submission will add to a shared word cloud!</p>
+    <textarea id="inputText" rows="5" placeholder="Type or paste your text here"></textarea><br>
+    <button onclick="submitText()">Submit</button>
+    <button onclick="resetWordCloud()">New Word Cloud</button>
+    <button onclick="exportWordCloud()">Download PNG</button>
+    <h2>Live Word Cloud</h2>
+    <canvas id="myCanvas" width="800" height="400"></canvas>
+  </div>
+  <div class="blue-bar"></div>
   
   <script>
     // Your Firebase configuration (replace with your own project's config)
@@ -102,6 +140,23 @@
       db.ref('submissions').remove();
       // Optionally, clear the canvas immediately (the on('value') listener will also update it)
       clearWordCloud();
+    }
+    
+    // Function to export the current word cloud as a PNG
+    function exportWordCloud() {
+      var canvas = document.getElementById('myCanvas');
+      // Convert canvas content to data URL (PNG format)
+      var imageURL = canvas.toDataURL('image/png');
+      
+      // Create a temporary link element
+      var dlLink = document.createElement('a');
+      dlLink.download = 'wordcloud.png';
+      dlLink.href = imageURL;
+      
+      // Trigger the download by simulating a click
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
     }
   </script>
 </body>
