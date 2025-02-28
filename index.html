@@ -20,7 +20,8 @@
   <p>Enter your text and click "Submit". Every submission will add to a shared word cloud!</p>
   <textarea id="inputText" rows="5" placeholder="Type or paste your text here"></textarea><br>
   <button onclick="submitText()">Submit</button>
-  <button onclick="clearWordCloud()">Clear Word Cloud</button>
+  <!-- New button to clear stored submissions and reset the word cloud -->
+  <button onclick="resetWordCloud()">New Word Cloud</button>
   <h2>Live Word Cloud</h2>
   <canvas id="myCanvas" width="800" height="400"></canvas>
   
@@ -93,6 +94,14 @@
       var canvas = document.getElementById('myCanvas');
       var context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // Function to clear all stored submissions and reset the word cloud
+    function resetWordCloud() {
+      // Remove the entire 'submissions' node from Firebase
+      db.ref('submissions').remove();
+      // Optionally, clear the canvas immediately (the on('value') listener will also update it)
+      clearWordCloud();
     }
   </script>
 </body>
